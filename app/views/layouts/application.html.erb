@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Instaapp</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <% if user_signed_in? %>
+      <li class="nav-item">
+        <%= link_to 'all user', root_path, class: 'nav-link'  %>
+      </li>
+      <li class="nav-item">
+        <%= link_to 'all public photos', photos_path, class: 'nav-link' %>
+      </li>
+      <li class="nav-item">
+        <%= link_to current_user.username, edit_user_registration_path, class: 'nav-link' %>
+      </li>
+      <li class="nav-item">
+        <%= button_to 'Sign Out', destroy_user_session_path, method: :delete %>
+      </li>
+    <% else %>
+      <li class="nav-item">
+        <%= link_to 'all user', root_path, class: 'nav-link'  %>
+      </li>
+      <li class="nav-item">
+        <%= link_to 'all public photos', root_path, class: 'nav-link'  %>
+      </li>
+      <li class="nav-item">
+          <%= link_to 'Sign In', new_user_session_path, class: 'nav-link' %>
+      </li>
+      <li class="nav-item">
+          <%= link_to 'Sign Up', new_user_registration_path, class: 'nav-link' %>
+      </li>
+    <% end %>
+      <p class="notice"><%= notice %></p>
+      <p class="alert"><%= alert %></p>
+      <%= yield %>
+  </body>
+</html>

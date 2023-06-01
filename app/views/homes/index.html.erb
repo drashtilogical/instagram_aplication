@@ -1,0 +1,21 @@
+<h1> List of user </h1>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">UserName</th>
+      <th scope="col">Private ?</th>
+      <th scope="col">   </th>
+      <th scope="col">   </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <th><%= user.username %></th>
+        <td><%= user.private ? 'Yes' : 'No' %></td>
+        <td>Follow</td>
+        <td><%= link_to "Show details", home_path(user.id) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
