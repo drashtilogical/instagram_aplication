@@ -17,7 +17,24 @@ class PhotosController < ApplicationController
     end
   end
 
-  # ...
+  def show
+    @photo = Photo.find(params[:id])
+  end
+
+  def like
+    @photo = Photo.find(params[:id])
+    current_user.likes.create(photo: @photo) unless current_user.likes.exists?(photo: @photo)
+    @photo.increment!(:like_count)
+    redirect_to @photo, notice: 'Photo liked successfully.'
+  end
+
+  def unlike
+    @photo = Photo.find(params[:id])
+    like = current_user.likes.find_by(photo: @photo)
+    like.destroy if like
+    @photo.decrement!(:like_count)
+    redirect_to @photo, notice: 'Photo unliked successfully.'
+  end
 
   private
 

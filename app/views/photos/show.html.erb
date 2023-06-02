@@ -1,7 +1,14 @@
-<h1>User Profile</h1>
+<h1>Photo Details</h1>
+<p>Image: <%= image_tag @photo.image, style: "width: 200px; display: block" %></p>
+<p>Caption: <%= @photo.caption%></p>
+<p>Owner: <%= @photo.user&.username%></p>
+<p>Posted: <%= time_ago_in_words(@photo.created_at) %> ago</p>
+<p>Like Count: <%= @photo.like_count %></p>
+<p>Add Fan: 
+<% if current_user.likes.exists?(photo_id: @photo.id) %>
+  <%= button_to 'Unlike', unlike_photo_path(@photo), method: :post %>
+<% else %>
+  <%= button_to 'Like', like_photo_path(@photo), method: :post %>
+<% end %></p>
 
-<!-- User details -->
-
-
-  <%= link_to 'Add Public Photo', new_photo_path %>
-
+<p>following </p>

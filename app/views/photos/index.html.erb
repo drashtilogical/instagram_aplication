@@ -1,12 +1,5 @@
- <%= link_to 'Add Public Photo', new_photo_path %>
+<%= link_to 'Add Public Photo', new_photo_path %>
 <h1>List of Photos</h1>
-  <ul>
-    <% @public_photos.each do |photo| %>
-      <li>
-        <p><%= photo.caption %></p>
-      </li>
-    <% end %>
-  </ul>
 <table class="table table-bordered">
   <thead>
     <tr>
@@ -23,8 +16,10 @@
       <tr>
         <td><%= image_tag photo.image, style: "width: 200px; display: block" %></td>
         <td><%= photo.caption %></td>
-        <td>current_user.username</td>
-        <td>hi</td>
+        <td><%= photo.user&.username %></td>
+        <td><%= time_ago_in_words(photo.created_at) %> ago</td>
+        <td><%= photo.like_count %></td>
+        <td><%= link_to "Show details", photo_path(photo.id) %></td>
       </tr>
     <% end %>
   </tbody>
