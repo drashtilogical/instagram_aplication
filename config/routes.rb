@@ -14,4 +14,14 @@ Rails.application.routes.draw do
       post 'unlike'
     end
   end
+  resources :users       
+  resources :homes, only: [:index, :show] do
+    member do
+      post 'follow'
+      delete 'unfollow'
+      delete 'cancel_request'
+      patch 'accept_request'
+      delete 'reject_request'
+    end
+  end
 end

@@ -13,7 +13,18 @@
       <tr>
         <th><%= user.username %></th>
         <td><%= user.private ? 'Yes' : 'No' %></td>
-        <td>Follow</td>
+        <td>  <% if current_user.following.include?(user) %>
+            <%= link_to 'Show Profile', home_path(user), class: 'btn btn-primary' %>
+          <% elsif user.private? %>
+            <% if current_user.pending_follow_requests.exists?(receiver: user) %>
+              <%= button_to 'Cancel Request', cancel_request_home_path(user), method: :delete %>
+            <% else %>
+              <%= button_to 'Send Request', follow_home_path(user), method: :post %>
+            <% end %>
+          <% else %>
+            <%= link_to 'Show Profile', home_path(user), class: 'btn btn-primary' %>
+          <% end %>
+        </td> 
         <td><%= link_to "Show details", home_path(user.id) %></td>
       </tr>
     <% end %>
