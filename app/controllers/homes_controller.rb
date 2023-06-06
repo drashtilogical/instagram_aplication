@@ -1,69 +1,75 @@
 class HomesController < ApplicationController
-  before_action :authenticate_user!, only: [:index, :show]
-
+  before_action :authenticate_user!, except: [:index, :show]
   def index
     @users = User.all
-    @receivers = current_user.sent_follow_requests.joins(:receiver)
   end
-  
+
   def show
+    if !user_signed_in?
+      redirect_to new_user_session_path, notice: 'Please sign in to view details.'
+    else
+      @user=User.find(params[:id])
+      @pending_requests = Following.where(followed_user: @user, status: 'pending').includes(:follower)
+      @photos = @user.photos
+    end
+  end
+
+
+  def send_request
     @user = User.find(params[:id])
-    @pending_requests = @user.pending_follow_requests
+    if @user.private?
+      following = current_user.followings.build(followed_user: @user, follower_id: current_user.id, status: "pending")
+      redirect_to @user, notice: 'Follow request sent.'
+    else
+      @user.increment!(:followers_count)
+      following = current_user.followings.build(followed_user: @user, follower_id: current_user.id, status: "accepted")
+      redirect_to home_path, notice: 'User followed successfully.'
+    end
   end
 
   def cancel_request
-    @user = User.find(params[:id])
-    @follow_request = current_user.sent_follow_requests.find_by(receiver_id: @user.id)
-  
-    if @follow_request
-      @follow_request.destroy
-      redirect_to users_path, notice: 'Follow request canceled.'
+    followed_user = User.find(params[:id])
+    following = current_user.followings.find_by(followed_user: followed_user, status: "pending")
+    if following
+      following.destroy
+      redirect_to user_path(followed_user), notice: "Follow request canceled for #{followed_user.username}."
     else
-      redirect_to users_path, notice: 'Follow request not found.'
+      redirect_to user_path(followed_user), alert: "No pending follow request found for #{followed_user.username}."
     end
   end
 
   def accept_request
-    @request = FollowRequest.find(params[:id])
-    @sender = @request.sender
-  
-    if @request.update(status: 'accepted')
-      current_user.follower(@sender)
-      current_user.following_requests.find_by(sender: @sender).destroy
-      redirect_to @sender, notice: 'Follow request accepted.'
+    follower = User.find(params[:id])
+    following = follower.followings.find_by(followed_user: current_user, status: "pending")
+    if following
+      following.update(status: "accepted")
+      redirect_to user_path(current_user), notice: "You have accepted the follow request from #{follower.username}."
     else
-      redirect_to @sender, alert: 'Unable to accept follow request.'
+      redirect_to user_path(current_user), alert: "No pending follow request found from #{follower.username}."
     end
   end
-  
+
   def reject_request
-    @request = FollowRequest.find(params[:id])
-    @sender = @request.sender
-
-    if @request.destroy
-      redirect_to @sender, notice: 'Follow request rejected.'
+    follower = User.find(params[:id])
+    following = follower.followings.find_by(followed_user: current_user, status: "pending")
+    if following
+      following.destroy
+      redirect_to user_path(current_user), notice: "You have rejected the follow request from #{follower.username}."
     else
-      redirect_to @sender, alert: 'Unable to reject follow request.'
+      redirect_to user_path(current_user), alert: "No pending follow request found from #{follower.username}."
     end
   end
 
-  def follow
-    @user = User.find(params[:id])
-    if @user.private?
-      current_user.sent_follow_requests.create(receiver: @user, status: 'pending')
-      redirect_to @user, notice: 'Follow request sent.'
-    else
-      @user.increment!(:followers_count)
-      current_user.following << @user unless current_user.following.include?(@user)
-      redirect_to home_path, notice: 'User followed successfully.'
-    end
-  end
-  
   def unfollow
-    @user = User.find(params[:id])
-    current_user.following.delete(@user)
-    @user.decrement!(:followers_count)
-    redirect_to @user, notice: 'User unfollowed successfully.'
+    followed_user = User.find(params[:id])
+    following = current_user.followings.find_by(followed_user: followed_user)
+    followed_user.decrement!(:followers_count)
+    if following
+      following.destroy
+      redirect_to user_path(followed_user), notice: "You have unfollowed #{followed_user.username}."
+    else
+      redirect_to user_path(followed_user), alert: "You were not following #{followed_user.username}."
+    end
   end
   
 end

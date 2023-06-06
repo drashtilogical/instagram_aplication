@@ -23,7 +23,9 @@ Rails.application.routes.draw do
       post 'send_request'
       delete 'cancel_request'
       patch 'accept_request'
-      delete 'reject_request'
+      patch 'reject_request'
     end
   end
+ 
+  
 end

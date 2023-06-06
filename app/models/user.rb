@@ -13,13 +13,8 @@ class User < ApplicationRecord
   has_many :reverse_followings, foreign_key: :followed_user_id, class_name: 'Following', dependent: :destroy
   has_many :followers, through: :reverse_followings, source: :follower
 
-  has_many :following, through: :followings, source: :followed_user
-
-  has_many :sent_follow_requests, foreign_key: :sender_id, class_name: 'FollowRequest', dependent: :destroy
-  has_many :received_follow_requests, foreign_key: :receiver_id, class_name: 'FollowRequest', dependent: :destroy
-
-  has_many :following_requests, foreign_key: 'receiver_id', class_name: 'FollowRequest', dependent: :destroy
-
+  
+  
   def following_count
     followings.count
   end
