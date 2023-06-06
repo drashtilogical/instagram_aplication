@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   has_many :photos
   has_many :likes
+  has_many :comments
   has_many :followings, foreign_key: :follower_id, dependent: :destroy
   has_many :followed_users, through: :followings, source: :followed_user
 
@@ -17,12 +18,30 @@ class User < ApplicationRecord
   has_many :sent_follow_requests, foreign_key: :sender_id, class_name: 'FollowRequest', dependent: :destroy
   has_many :received_follow_requests, foreign_key: :receiver_id, class_name: 'FollowRequest', dependent: :destroy
 
+  has_many :following_requests, foreign_key: 'receiver_id', class_name: 'FollowRequest', dependent: :destroy
+
   def following_count
     followings.count
   end
 
   def pending_follow_requests
     received_follow_requests.where(status: 'pending')
+  end
+
+  def following?(other_user)
+    if other_user && following = followings.find_by(followed_user_id: other_user.id)
+      true
+    else
+      false
+    end
+  end
+
+  def follower(user)
+    self.following << user unless self.following.include?(user)
+    self.save
+  end
+  def follow_request_sent?(other_user)
+    following_requests.exists?(receiver_id: other_user.id)
   end
   
 end

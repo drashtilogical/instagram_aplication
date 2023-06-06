@@ -2,21 +2,21 @@
 <p>Username: <%= @user.username %></p>
 <p>Private Account: <%= @user.private ? 'Yes' : 'No' %></p>
 <p>Followers :<%= @user.followers_count %></p>
-
-<% if current_user.following.include?(@user) %>
-  <%= button_to 'Unfollow', unfollow_home_path(@user), method: :delete %>
-<% elsif current_user.pending_follow_requests.exists?(receiver: @user) %>
-  <p>Pending Request from: <%= current_user.username %></p>
-  <%= button_to 'Accept', accept_request_home_path(current_user.pending_follow_requests.find_by(receiver: @user)), method: :patch %>
-  <%= button_to 'Reject', reject_request_home_path(current_user.pending_follow_requests.find_by(receiver: @user)), method: :delete %>
-<% elsif @user.private? %>
-  <% if current_user.sent_follow_requests.exists?(receiver: @user) %>
-    <%= button_to 'Cancel Request', cancel_request_home_path(@user), method: :delete %>
+<% if current_user == @user %>
+  <% if @pending_requests.present? %>
+    <ul>
+      <% @pending_requests.each do |request| %>
+        <li>
+          <%= " #{request.sender.username} has sent a follow request." %>
+          <%= button_to 'Accept', accept_request_home_path(request), method: :patch %>
+          <%= button_to 'Reject', reject_request_home_path(request), method: :delete %>
+        </li>
+      <% end %>
+    </ul>
   <% else %>
-    <%= button_to 'Send Request', follow_home_path(@user), method: :post %>
+    <p>No pending follow requests.</p>
   <% end %>
-<% else %>
-  <%= link_to 'Show Profile', home_path(@user), class: 'btn btn-primary' %>
 <% end %>
+
 <p>Following :<%= @user.following_count %></p>
 

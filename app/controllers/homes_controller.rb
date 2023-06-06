@@ -1,26 +1,49 @@
 class HomesController < ApplicationController
+  before_action :authenticate_user!, only: [:index, :show]
+
   def index
     @users = User.all
-    @follow_request_sent_users = current_user.sent_follow_requests.map(&:receiver) if user_signed_in?
+    @receivers = current_user.sent_follow_requests.joins(:receiver)
   end
-
+  
   def show
     @user = User.find(params[:id])
-    @followers_count = @user.followers.count
-    @following_count = @user.following_count
+    @pending_requests = @user.pending_follow_requests
+  end
+
+  def cancel_request
+    @user = User.find(params[:id])
+    @follow_request = current_user.sent_follow_requests.find_by(receiver_id: @user.id)
   
-  
-    
-    if current_user.sent_follow_requests.exists?(receiver: @user)
-      @follow_request_status = 'pending'
-      @follow_request = current_user.sent_follow_requests.find_by(receiver: @user)
-      @follower_name = @follow_request.sender.username
-    elsif current_user.following.include?(@user)
-      @follow_request_status = 'following'
-    elsif @user.private?
-      @follow_request_status = 'not_following'
+    if @follow_request
+      @follow_request.destroy
+      redirect_to users_path, notice: 'Follow request canceled.'
     else
-      @follow_request_status = 'public_account'
+      redirect_to users_path, notice: 'Follow request not found.'
+    end
+  end
+
+  def accept_request
+    @request = FollowRequest.find(params[:id])
+    @sender = @request.sender
+  
+    if @request.update(status: 'accepted')
+      current_user.follower(@sender)
+      current_user.following_requests.find_by(sender: @sender).destroy
+      redirect_to @sender, notice: 'Follow request accepted.'
+    else
+      redirect_to @sender, alert: 'Unable to accept follow request.'
+    end
+  end
+  
+  def reject_request
+    @request = FollowRequest.find(params[:id])
+    @sender = @request.sender
+
+    if @request.destroy
+      redirect_to @sender, notice: 'Follow request rejected.'
+    else
+      redirect_to @sender, alert: 'Unable to reject follow request.'
     end
   end
 
@@ -35,29 +58,7 @@ class HomesController < ApplicationController
       redirect_to home_path, notice: 'User followed successfully.'
     end
   end
-
-  def cancel_request
-    @user = User.find(params[:id])
-    request = current_user.sent_follow_requests.find_by(receiver: @user)
-    request.destroy if request
-    redirect_to @user, notice: 'Follow request canceled.'
-  end
   
-
-  def accept_request
-    @user = User.find(params[:id])
-    request = current_user.pending_follow_requests.find_by(sender: @user)
-    request.update(status: 'accepted') if request
-    redirect_to @user, notice: 'Follow request accepted.'
-  end
-
-  def reject_request
-    @user = User.find(params[:id])
-    request = current_user.pending_follow_requests.find_by(sender: @user)
-    request.destroy if request
-    redirect_to @user, notice: 'Follow request rejected.'
-  end
-
   def unfollow
     @user = User.find(params[:id])
     current_user.following.delete(@user)
@@ -66,4 +67,3 @@ class HomesController < ApplicationController
   end
   
 end
-

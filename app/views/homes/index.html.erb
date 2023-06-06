@@ -13,17 +13,24 @@
       <tr>
         <th><%= user.username %></th>
         <td><%= user.private ? 'Yes' : 'No' %></td>
-        <td>  <% if current_user.following.include?(user) %>
-            <%= link_to 'Show Profile', home_path(user), class: 'btn btn-primary' %>
-          <% elsif user.private? %>
-            <% if current_user.pending_follow_requests.exists?(receiver: user) %>
-              <%= button_to 'Cancel Request', cancel_request_home_path(user), method: :delete %>
-            <% else %>
-              <%= button_to 'Send Request', follow_home_path(user), method: :post %>
-            <% end %>
+        <td>
+        <% if current_user == user %>
+          <%= button_to "Follow", home_path(user.id), method: :get %>
+        <% elsif user.private? %>
+        <% if current_user.sent_follow_requests.exists?(receiver_id: user.id) %>
+            Request sent...<%= button_to 'Cancel', cancel_request_home_path(user), method: :delete, data: { confirm: 'Are you sure you want to cancel the request?' } %>
+          <% elsif current_user.following?(user) %>
+            <%= button_to 'Unfollow', unfollow_home_path(user), method: :delete %>
           <% else %>
-            <%= link_to 'Show Profile', home_path(user), class: 'btn btn-primary' %>
+            <%= button_to 'Follow', follow_home_path(user), method: :post %>
           <% end %>
+          <% else %>
+            <% if current_user.following?(user) %>
+              <%= button_to 'Unfollow', unfollow_home_path(user), method: :delete %>
+            <% else %>
+              <%= button_to 'Follow', follow_home_path(user), method: :post %>
+          <% end %>
+        <% end %>
         </td> 
         <td><%= link_to "Show details", home_path(user.id) %></td>
       </tr>

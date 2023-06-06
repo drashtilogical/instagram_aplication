@@ -6,19 +6,21 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { sessions: 'users/sessions' }
 
   root "homes#index"
-  resources :homes, only: [:show]
   
   resources :photos do
     member do
       post 'like'
       post 'unlike'
     end
+    resources :comments, only: [:create]
   end
-  resources :users       
+  resources :users     
+
   resources :homes, only: [:index, :show] do
     member do
       post 'follow'
       delete 'unfollow'
+      post 'send_request'
       delete 'cancel_request'
       patch 'accept_request'
       delete 'reject_request'

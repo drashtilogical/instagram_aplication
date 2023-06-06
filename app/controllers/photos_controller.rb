@@ -1,10 +1,8 @@
 class PhotosController < ApplicationController
-  def new
-    @photo = Photo.new
-  end
-
   def index
-    @public_photos = Photo.all
+    @public_users = User.where(private: false)
+    @public_photos = Photo.where(user: @public_users)
+    @photo = Photo.new
   end
 
   def create

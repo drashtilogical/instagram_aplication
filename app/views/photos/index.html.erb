@@ -1,4 +1,17 @@
-<%= link_to 'Add Public Photo', new_photo_path %>
+<%= form_with(model: @photo, url: photos_path, method: :post, local: true) do |form| %>
+  <div class="field">
+    <%= form.label :image %>
+    <%= form.file_field :image %>
+  </div>
+
+  <div class="field">
+    <%= form.label :caption %>
+    <%= form.text_field :caption %>
+  </div>
+
+  <%= form.submit %>
+<% end %>
+
 <h1>List of Photos</h1>
 <table class="table table-bordered">
   <thead>
