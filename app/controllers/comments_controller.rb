@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Top-level documentation comment for CommentsController
 class CommentsController < ApplicationController
   def create
     @photo = Photo.find(params[:photo_id])

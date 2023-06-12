@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Represents a folowing model
 class Following < ApplicationRecord
   belongs_to :follower, class_name: 'User'
   belongs_to :followed_user, class_name: 'User'

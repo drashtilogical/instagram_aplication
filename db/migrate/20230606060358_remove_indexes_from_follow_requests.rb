@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Migration to remove  forgin key from followrequest
 class RemoveIndexesFromFollowRequests < ActiveRecord::Migration[7.0]
   def change
     remove_index :follow_requests, name: 'index_follow_requests_on_receiver_id'

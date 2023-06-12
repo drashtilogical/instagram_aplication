@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Controller for managing photos.
 class PhotosController < ApplicationController
   def index
     @public_users = User.where(private: false)
@@ -29,7 +32,7 @@ class PhotosController < ApplicationController
   def unlike
     @photo = Photo.find(params[:id])
     like = current_user.likes.find_by(photo: @photo)
-    like.destroy if like
+    like.destroy if like.present?
     @photo.decrement!(:like_count)
     redirect_to @photo, notice: 'Photo unliked successfully.'
   end
