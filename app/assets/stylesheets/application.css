@@ -13,3 +13,23 @@
  *= require_tree .
  *= require_self
  */
+
+table ,td ,th{
+  border-style: solid;
+  box-sizing: border-box;
+  text-indent: initial;
+  border-spacing: 2px;
+  border-color: grey;
+}
+table{
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+}
+
+@media screen and (max-width: 800px) {
+  table{
+    border-left-width: 28px;
+  }
+}

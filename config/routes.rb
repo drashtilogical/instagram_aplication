@@ -5,8 +5,8 @@ Rails.application.routes.draw do
   # root "articles#index"
   devise_for :users, controllers: { sessions: 'users/sessions' }
 
-  root "homes#index"
-  
+  root 'homes#index'
+
   resources :photos do
     member do
       post 'like'
@@ -14,9 +14,9 @@ Rails.application.routes.draw do
     end
     resources :comments, only: [:create]
   end
-  resources :users     
+  resources :users
 
-  resources :homes, only: [:index, :show] do
+  resources :homes, only: %i[index show] do
     member do
       post 'follow'
       delete 'unfollow'
@@ -24,8 +24,7 @@ Rails.application.routes.draw do
       delete 'cancel_request'
       patch 'accept_request'
       patch 'reject_request'
+      match 'like_photo', via: %i[post get]
     end
   end
- 
-  
 end

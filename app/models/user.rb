@@ -13,30 +13,7 @@ class User < ApplicationRecord
   has_many :reverse_followings, foreign_key: :followed_user_id, class_name: 'Following', dependent: :destroy
   has_many :followers, through: :reverse_followings, source: :follower
 
-  
-  
-  def following_count
-    followings.count
-  end
-
-  def pending_follow_requests
-    received_follow_requests.where(status: 'pending')
-  end
-
   def following?(other_user)
-    if other_user && following = followings.find_by(followed_user_id: other_user.id)
-      true
-    else
-      false
-    end
+    followings.exists?(followed_user_id: other_user.id, status: 'accepted')
   end
-
-  def follower(user)
-    self.following << user unless self.following.include?(user)
-    self.save
-  end
-  def follow_request_sent?(other_user)
-    following_requests.exists?(receiver_id: other_user.id)
-  end
-  
 end

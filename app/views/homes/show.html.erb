@@ -1,7 +1,7 @@
 <h1>User Details</h1>
 <p>Username: <%= @user.username %></p>
 <p>Private Account: <%= @user.private ? 'Yes' : 'No' %></p>
-<p>Followers :<%= @user.followers_count %></p>
+<p>Followers :<%= @follower_count %></p>
 
 <% if current_user == @user %>
   <% @pending_requests.each do |request| %>
@@ -14,7 +14,7 @@
     <% end %>
   <% end %>
 <% end %>
-<p>Following :<%= @user.following_count %></p>
+<p>Following :<%= @following_count %></p>
 
 <h1>Own Photos</h1>
 <table class="table table-bordered">
@@ -41,4 +41,5 @@
     <% end %>
   </tbody>
 </table>
+<%= link_to "Liked Photos", like_photo_home_path(@user) %>
 

@@ -32,11 +32,10 @@
               <%= button_to "Follow", send_request_home_path(user.id), method: :post %>
             <% end %>
           <% else %>
-            <%= button_to "Follow", home_path(user.id), method: :get %>
+            <%= button_to "Follow", send_request_home_path(user.id), method: :post %>
           <% end %>
         <% end %>
-<% end %>
-
+      <% end %>
       </td> 
       <td><%= link_to "Show details", home_path(user.id) %></td>
       </tr>
